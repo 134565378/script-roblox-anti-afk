@@ -29,12 +29,13 @@ end
 -- Buat UI dengan nama pembuat
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "UI"
+ScreenGui.Enabled = true
 ScreenGui.Parent = player.PlayerGui
 
 local Frame = Instance.new("Frame")
 Frame.Size = UDim2.new(0, 200, 0, 50)
 Frame.Position = UDim2.new(0.5, -100, 0.5, -25)
-Frame.BackgroundColor3 = Color3.new(0, 0, 0)
+Frame.BackgroundColor3 = Color3.new(0, 1, 0) -- Warna awal UI adalah hijau
 Frame.BackgroundTransparency = 0.5
 Frame.Parent = ScreenGui
 
@@ -51,15 +52,39 @@ local function toggleUI()
     ScreenGui.Enabled = not ScreenGui.Enabled
 end
 
+-- Fungsi untuk mengubah warna UI
+local function changeUIColor()
+    if Frame.BackgroundColor3 == Color3.new(0, 1, 0) then
+        Frame.BackgroundColor3 = Color3.new(1, 0, 0) -- Mengubah warna menjadi merah
+    else
+        Frame.BackgroundColor3 = Color3.new(0, 1, 0) -- Mengubah warna menjadi hijau
+    end
+end
+
 -- Fungsi untuk menangani input pemain
 local function onKeyPress(input)
     if input.KeyCode == Enum.KeyCode.E then
         toggleUI()
+    elseif input.KeyCode == Enum.KeyCode.B then
+        changeUIColor()
     end
 end
 
 -- Menghubungkan fungsi onKeyPress dengan event UserInputService.InputBegan
 game:GetService("UserInputService").InputBegan:Connect(onKeyPress)
+
+-- Fungsi untuk memindahkan UI
+local function dragUI(input)
+    local delta = input.Position - input.Position - input.Position
+    Frame.Position = Frame.Position + UDim2.new(0, delta.X, 0, delta.Y)
+end
+
+-- Menghubungkan fungsi dragUI dengan event UserInputService.InputChanged
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement and input:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) and ScreenGui.Enabled then
+        dragUI(input)
+    end
+end)
 
 -- Periksa secara berulang waktu terakhir aktif untuk mendeteksi AFK
 while true do
